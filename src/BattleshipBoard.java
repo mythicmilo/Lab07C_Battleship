@@ -6,32 +6,34 @@ import java.util.Random;
 
 public class BattleshipBoard
 {
-    private BattleshipTile[][] board;
-    private String[][] shipBoard;
-    private ImageIcon oceanIcon;
-    private ImageIcon splashIcon;
-    private ImageIcon explosionIcon;
+    private final int[] ships = {5, 4, 3, 3, 2};
+    private final int ROWS = 10;
+    private final int COLS = 10;
+    private BattleshipTile[][] board = new BattleshipTile[ROWS][COLS];
+    private String[][] shipBoard = new String[ROWS][COLS];
+    private ImageIcon oceanIcon = new ImageIcon("src/ocean.jpg");
+    private ImageIcon splashIcon = new ImageIcon("src/splash.jpg");
+    private ImageIcon explosionIcon = new ImageIcon("src/explosion.jpg");
     private int missCount = 0;
     private int totalMissCount = 0;
     private int strikeCount = 0;
     private int totalHitCount = 0;
     private int shipCount = 1;
     private int sunkCount = 0;
-    private ArrayList<Integer> ship1;
-    private ArrayList<Integer> ship2;
-    private ArrayList<Integer> ship3;
-    private ArrayList<Integer> ship4;
-    private ArrayList<Integer> ship5;
-    private final int[] ships = {5, 4, 3, 3, 2};
-    private final int ROWS = 10;
-    private final int COLS = 10;
+    private ArrayList<Integer> ship1 = new ArrayList<>();
+    private ArrayList<Integer> ship2 = new ArrayList<>();
+    private ArrayList<Integer> ship3 = new ArrayList<>();
+    private ArrayList<Integer> ship4 = new ArrayList<>();
+    private ArrayList<Integer> ship5 = new ArrayList<>();
 
     public BattleshipBoard(JPanel boardPnl, JTextField totalHitTF,
                            JTextField totalMissTF, JTextField missTF,
                            JTextField strikeTF)
     {
-        board = new BattleshipTile[ROWS][COLS];
-        oceanIcon = new ImageIcon("src/ocean.jpg");
+        totalHitTF.setText("" + totalHitCount);
+        totalMissTF.setText("" + totalMissCount);
+        missTF.setText("" + missCount);
+        strikeTF.setText("" + strikeCount);
         ActionListener tileListener = new ActionListener()
         {
             @Override
@@ -54,31 +56,34 @@ public class BattleshipBoard
         placeShips();
     }
 
-    public void resetGame()
+    public void resetGame(JTextField totalHitTF,
+                          JTextField totalMissTF, JTextField missTF,
+                          JTextField strikeTF)
     {
         for (int row = 0; row < ROWS; row++)
         {
             for (int col = 0; col < COLS; col++)
             {
-                board[row][col] = new BattleshipTile(row, col);
                 board[row][col].setIcon(oceanIcon);
                 board[row][col].setEnabled(true);
             }
         }
         missCount = 0;
+        missTF.setText("" + missCount);
         totalMissCount = 0;
+        totalMissTF.setText("" + totalMissCount);
         strikeCount = 0;
+        strikeTF.setText("" + strikeCount);
         totalHitCount = 0;
+        totalHitTF.setText("" + totalHitCount);
         shipCount = 1;
+        placeShips();
     }
 
     public void checkShipBoard(Object tile, JTextField totalHitTF,
                                JTextField totalMissTF, JTextField missTF,
                                JTextField strikeTF)
     {
-        splashIcon = new ImageIcon("src/splash.jpg");
-        explosionIcon = new ImageIcon("src/explosion.jpg");
-
         for (int row = 0; row < ROWS; row++)
         {
             for (int col = 0; col < COLS; col++)
@@ -89,15 +94,17 @@ public class BattleshipBoard
                     {
                         shipBoard[row][col] = "hit";
                         board[row][col].setIcon(explosionIcon);
+                        board[row][col].setDisabledIcon(explosionIcon);
                         totalHitCount++;
                         totalHitTF.setText("" + totalHitCount);
                         missCount = 0;
                         missTF.setText("" + missCount);
-                        checkShipStatus(row, col);
+                        checkShipStatus(row, col, totalHitTF, totalMissTF, missTF, strikeTF);
                     }
                     else
                     {
                         board[row][col].setIcon(splashIcon);
+                        board[row][col].setDisabledIcon(splashIcon);
                         totalMissCount++;
                         totalMissTF.setText("" + totalMissCount);
                         missCount++;
@@ -107,7 +114,7 @@ public class BattleshipBoard
                             strikeCount++;
                             strikeTF.setText("" + strikeCount);
                             missCount = 0;
-                            checkStrike();
+                            checkStrike(totalHitTF, totalMissTF, missTF, strikeTF);
                         }
                     }
                     board[row][col].setEnabled(false);
@@ -116,7 +123,9 @@ public class BattleshipBoard
         }
     }
 
-    public void checkShipStatus(int row, int col)
+    public void checkShipStatus(int row, int col, JTextField totalHitTF,
+                                JTextField totalMissTF, JTextField missTF,
+                                JTextField strikeTF)
     {
         int hitCount = 1;
         if (ship1.contains(row) && ship1.contains(col))
@@ -132,7 +141,7 @@ public class BattleshipBoard
             {
                 sunkCount++;
                 JOptionPane.showMessageDialog(null, "The ship has sunk!");
-                checkWin();
+                checkWin(totalHitTF, totalMissTF, missTF, strikeTF);
             }
         }
         else if (ship2.contains(row) && ship2.contains(col))
@@ -148,7 +157,7 @@ public class BattleshipBoard
             {
                 sunkCount++;
                 JOptionPane.showMessageDialog(null, "The ship has sunk!");
-                checkWin();
+                checkWin(totalHitTF, totalMissTF, missTF, strikeTF);
             }
         }
         else if (ship3.contains(row) && ship3.contains(col))
@@ -164,7 +173,7 @@ public class BattleshipBoard
             {
                 sunkCount++;
                 JOptionPane.showMessageDialog(null, "The ship has sunk!");
-                checkWin();
+                checkWin(totalHitTF, totalMissTF, missTF, strikeTF);
             }
         }
         else if (ship4.contains(row) && ship4.contains(col))
@@ -180,7 +189,7 @@ public class BattleshipBoard
             {
                 sunkCount++;
                 JOptionPane.showMessageDialog(null, "The ship has sunk!");
-                checkWin();
+                checkWin(totalHitTF, totalMissTF, missTF, strikeTF);
             }
         }
         else if (ship5.contains(row) && ship5.contains(col))
@@ -196,11 +205,13 @@ public class BattleshipBoard
             {
                 sunkCount++;
                 JOptionPane.showMessageDialog(null, "The ship has sunk!");
-                checkWin();
+                checkWin(totalHitTF, totalMissTF, missTF, strikeTF);
             }
         }
     }
-    public void checkWin()
+    public void checkWin(JTextField totalHitTF,
+                         JTextField totalMissTF, JTextField missTF,
+                         JTextField strikeTF)
     {
         if (sunkCount == shipCount)
         {
@@ -208,12 +219,14 @@ public class BattleshipBoard
             int playAgain = JOptionPane.showConfirmDialog(null, "Do you want to play again?", "Confirm Play Again", JOptionPane.YES_NO_OPTION);
             if (playAgain == JOptionPane.YES_OPTION)
             {
-                resetGame();
+                resetGame(totalHitTF, totalMissTF, missTF, strikeTF);
             }
         }
     }
 
-    public void checkStrike()
+    public void checkStrike(JTextField totalHitTF,
+                            JTextField totalMissTF, JTextField missTF,
+                            JTextField strikeTF)
     {
         if (strikeCount == 3)
         {
@@ -221,7 +234,7 @@ public class BattleshipBoard
             int playAgain = JOptionPane.showConfirmDialog(null, "Do you want to play again?", "Confirm Play Again", JOptionPane.YES_NO_OPTION);
             if (playAgain == JOptionPane.YES_OPTION)
             {
-                resetGame();
+                resetGame(totalHitTF, totalMissTF, missTF, strikeTF);
             }
         }
     }
@@ -264,40 +277,32 @@ public class BattleshipBoard
         }
     }
 
-    private void resetRowPlacement(int row, int colStart, int shipLength)
-    {
-        for (int r = 0; r < shipLength; r++)
-        {
-            if (shipBoard[row][colStart + r].equals("placed"))
-            {
-                shipBoard[row][colStart + r] = "empty";
-            }
-        }
-    }
-
-    private void resetColPlacement(int col, int rowStart, int shipLength)
-    {
-        for (int r = 0; r < shipLength; r++)
-        {
-            if (shipBoard[rowStart + r][col].equals("placed"))
-            {
-                shipBoard[rowStart + r][col] = "empty";
-            }
-        }
-    }
-
     private boolean scanShipBoardHorz(int row, int colStart, int shipLength)
     {
         for (int i = 0; i < shipLength; i++)
         {
-            if (shipBoard[row][colStart + i].equals("empty"))
+            if (colStart + i == COLS)
             {
-                shipBoard[row][colStart + i] = "placed";
+                i--;
+                int colStop = colStart + i;
+                for (int r = colStart; r <= colStop; r++)
+                {
+                    shipBoard[row][colStart] = "empty";
+                }
+                return false;
+            }
+            else if (shipBoard[row][colStart + i].equals("placed"))
+            {
+                int colStop = colStart + i;
+                for (int r = colStart; r < colStop; r++)
+                {
+                    shipBoard[row][colStart] = "empty";
+                }
+                return false;
             }
             else
             {
-                resetRowPlacement(row, colStart, shipLength);
-                return false;
+                shipBoard[row][colStart + i] = "placed";
             }
         }
         if (shipCount == 1)
@@ -348,7 +353,6 @@ public class BattleshipBoard
                 int col = colStart + j;
                 ship5.add(col);
             }
-            shipCount++;
         }
         return true;
     }
@@ -357,14 +361,28 @@ public class BattleshipBoard
     {
         for (int i = 0; i < shipLength; i++)
         {
-            if (shipBoard[rowStart + i][col].equals("empty"))
+            if (rowStart + i == ROWS)
             {
-                shipBoard[rowStart + i][col] = "placed";
+                i--;
+                int rowStop = rowStart + i;
+                for (int r = rowStart; r <= rowStop; r++)
+                {
+                    shipBoard[rowStart][col] = "empty";
+                }
+                return false;
+            }
+            else if (shipBoard[rowStart + i][col].equals("placed"))
+            {
+                int rowStop = rowStart + i;
+                for (int r = rowStart; r < rowStop; r++)
+                {
+                    shipBoard[rowStart][col] = "empty";
+                }
+                return false;
             }
             else
             {
-                resetColPlacement(col, rowStart, shipLength);
-                return false;
+                shipBoard[rowStart + i][col] = "placed";
             }
         }
         if (shipCount == 1)
